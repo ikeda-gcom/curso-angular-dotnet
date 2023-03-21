@@ -488,5 +488,8 @@ testem.log
 Thumbs.db
 
 
-# Database
+# Excluindo DB
 ProEventos.db
+*.db
+*.db-shm
+*.db-wal
