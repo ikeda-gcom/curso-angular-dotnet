@@ -1,5 +1,8 @@
 <app-nav></app-nav>
 <div class="container">
-  <app-eventos></app-eventos>
   <router-outlet></router-outlet>
 </div>
+<ngx-spinner name="sp3" [fullScreen]="true" type="ball-spin-clockwise" size="medium">
+  <p style="font-size: 20px; color: white">Carregando...</p>
+</ngx-spinner>
+
