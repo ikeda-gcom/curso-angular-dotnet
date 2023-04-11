@@ -39,3 +39,4 @@ namespace ProEventos.Application.Dtos
         public IEnumerable<PalestranteDto> PalestrantesEventos { get; set; }
     }
 }
+
