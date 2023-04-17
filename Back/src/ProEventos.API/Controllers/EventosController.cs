@@ -93,7 +93,7 @@ namespace ProEventos.API.Controllers
         {
             try
             {
-                return await _eventoService.DeleteEvento(id) ? Ok("Evento excluído") : BadRequest("Erro ao tentar excluir evento.");
+                return await _eventoService.DeleteEvento(id) ? Ok(new { message = "Excluído" }) : BadRequest("Erro ao tentar excluir evento.");
             }
             catch (Exception ex)
             {

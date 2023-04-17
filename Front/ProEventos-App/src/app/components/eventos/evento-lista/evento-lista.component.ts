@@ -16,6 +16,7 @@ export class EventoListaComponent implements OnInit {
 
   public eventos: Evento[] = [];
   public eventosFiltrados: Evento[] = [];
+  public eventoId = 0;
   
   public widthImg: number = 150;
   public marginImg: number = 2;
@@ -23,6 +24,7 @@ export class EventoListaComponent implements OnInit {
   public descricaoImg = "ocultar";
   public classeImg = "fa fa-eye-slash";
   private _filtroLista: string = "";
+
 
   public get filtroLista(): string {
     return this._filtroLista;
@@ -51,21 +53,19 @@ export class EventoListaComponent implements OnInit {
   
   public ngOnInit() {
     this.showSpinner('sp3');
-    this.getEventos();
+    this.carregarEventos();
   }
   
-  public getEventos(): void {
+  public carregarEventos(): void {
     this.eventoService.getEventos().subscribe({
       next: (_eventos: Evento[]) => {
         this.eventos = _eventos;
         this.eventosFiltrados = this.eventos;
       },
       error: (error: any) => {
-        this.hideSpinner('sp3'),
         this.toastr.error('Erro ao carregar os eventos.', 'Error!')
-      },
-      complete: () => this.hideSpinner('sp3')
-    });
+      }
+    }).add(() => this.hideSpinner('sp3'));
   }
 
   public ocultarExibir(): void {
@@ -81,21 +81,31 @@ export class EventoListaComponent implements OnInit {
     }
   }
 
-  openModal(template: TemplateRef<any>): void {
+  openModal(event:any, template: TemplateRef<any>, eventoId: number): void {
+    event.stopPropagation();
+    this.eventoId = eventoId;
     this.modalRef = this.modalService.show(template, {class: 'modal-sm'});
   }
  
   confirm(): void {
-    this.showSuccess();
     this.modalRef?.hide();
+
+    this.eventoService.deleteEvento(this.eventoId).subscribe(
+      (result: any) => {
+        if (result.message === 'Excluído') {
+          this.toastr.success('O Evento foi excluído com sucesso!', 'Excluído!');
+          this.carregarEventos();
+        }
+      },
+      (error: any) => {
+        console.error(error);
+        this.toastr.error(`Erro ao tentar excluir evento ${this.eventoId}`, 'Erro!');
+      }    
+    ).add(() => this.hideSpinner('sp3'));
   }
  
   decline(): void {
     this.modalRef?.hide();
-  }
-
-  showSuccess() {
-    this.toastr.success('O Evento foi excluído com sucesso!', 'Excluído!');
   }
 
   showSpinner(name: string) {
