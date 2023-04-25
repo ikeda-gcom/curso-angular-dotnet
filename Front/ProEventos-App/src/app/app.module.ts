@@ -14,6 +14,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { ptBrLocale } from 'ngx-bootstrap/locale';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,6 +27,7 @@ import { NavComponent } from './shared/nav/nav.component';
 
 
 import { EventoService } from './services/evento.service';
+import { LoteService } from './services/lote.service';
 import { DateTimeFormatPipe } from './helpers/DateTimeFormat.pipe';
 import { TituloComponent } from './shared/titulo/titulo.component';
 import { EventoListaComponent } from './components/eventos/evento-lista/evento-lista.component';
@@ -62,6 +64,7 @@ defineLocale('pt-br', ptBrLocale);
     ReactiveFormsModule,
     CommonModule,
     NgxSpinnerModule,
+    NgxCurrencyModule,
     BsDatepickerModule.forRoot(),
     CollapseModule.forRoot(),
     TooltipModule.forRoot(),
@@ -74,7 +77,10 @@ defineLocale('pt-br', ptBrLocale);
       progressBar: true
     })    
   ],
-  providers: [EventoService],
+  providers: [
+    EventoService,
+    LoteService
+  ],
   bootstrap: [AppComponent],
   schemas:   [CUSTOM_ELEMENTS_SCHEMA]
 })
