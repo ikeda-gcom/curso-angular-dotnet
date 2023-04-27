@@ -10,6 +10,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { timeout } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-evento-detalhe',
@@ -18,20 +19,20 @@ import { timeout } from 'rxjs';
   // providers: [DatePipe],
 })
 export class EventoDetalheComponent implements OnInit {
-  modalRef: BsModalRef | any;
-  eventoId: number | any;
+  modalRef: BsModalRef;
+  eventoId: number;
   evento = {} as Evento;
-  form: FormGroup | any;
+  form: FormGroup;
   estadoSalvar = 'post';
   loteAtual = { id: 0, nome: '', indice: 0 };
-  imagemURL = 'assets/img/upload.png';
-  // file: File;
+  imagemURL: string;
+  file: File;
 
   get modoEditar(): boolean {
     return this.estadoSalvar === 'put';
   }
 
-  get lotes(): FormArray | any{
+  get lotes(): FormArray{
     return this.form.get('lotes') as FormArray ;
   }
 
@@ -76,9 +77,11 @@ export class EventoDetalheComponent implements OnInit {
           (evento: Evento) => {
             this.evento = { ...evento };
             this.form.patchValue(this.evento);
-            /*if (this.evento.imagemURL !== '') {
-              this.imagemURL = environment.apiURL + 'resources/images/' + this.evento.imagemURL;
-            }*/
+            if (this.evento.imagemURL !== '')
+              this.imagemURL = environment.apiURL + 'Resources/Images/' + this.evento.imagemURL;
+            else
+              this.imagemURL = 'assets/img/upload.png';
+            
             this.carregarLotes();
           },
           (error: any) => {
@@ -187,7 +190,7 @@ export class EventoDetalheComponent implements OnInit {
   }
 
   public salvarLotes(): void {
-    if (this.form.controls.lotes.valid) {
+    if (this.form.controls['lotes'].valid) {
       this.spinner.show();
       this.loteService
         .saveLote(this.eventoId, this.form.value.lotes)
@@ -230,11 +233,37 @@ export class EventoDetalheComponent implements OnInit {
           );
           console.error(error);
         }
-      )
-      .add(() => this.spinner.hide());
+      ).add(() => this.spinner.hide());
   }
 
   declineDeleteLote(): void {
     this.modalRef.hide();
+  }
+
+  onFileChange(ev: any): void {
+    const reader = new FileReader();
+
+    reader.onload = (event: any) => {
+      this.imagemURL = event.target.result;
+    }
+
+    this.file = ev.target.files;
+    reader.readAsDataURL(this.file[0]);
+    
+    this.uploadImagem();
+  }
+
+  uploadImagem(): void {
+    this.spinner.show();
+    this.eventoService.postUpload(this.eventoId, this.file).subscribe(
+      () => {
+        this.router.navigate([`eventos/detalhe/${this.eventoId}`]);
+        this.toastr.success('Imagem atualizada com sucesso', 'Sucesso!');
+      },
+      (error: any) => {
+        this.toastr.error('Erro ao fazer upload de imagem','Erro!');
+        console.log(error);
+      },
+    ).add(() => this.spinner.hide());
   }
 }
